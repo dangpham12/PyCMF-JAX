@@ -1,5 +1,4 @@
-import math
-import numpy as np
+import jax.numpy as jnp
 from typing import TYPE_CHECKING
 
 from src.constants import DTYPE_ACCURACY
@@ -21,8 +20,8 @@ class Universe(UniverseBase, TickingModel):
 
     The universe does not contain itself.
     """
-    TIME_DELTA: np.float16 = 0.01
-    EVAPORATION_RATE: np.float16 = 0.0001
+    TIME_DELTA: jnp.float16 = 0.01
+    EVAPORATION_RATE: jnp.float32 = 0.0001
 
     def __init__(self):
         super().__init__()
@@ -54,7 +53,7 @@ class Universe(UniverseBase, TickingModel):
     def radiate_inside(energy_radiation_per_time_delta: DTYPE_ACCURACY, *, source: "CelestialBody"):
         for celestial_body in source.objects_in_line_of_sight:
             solid_angle = source.solid_angle(celestial_body)
-            celestial_body.receive_radiation(energy_radiation_per_time_delta * solid_angle / (4 * math.pi))
+            celestial_body.receive_radiation(energy_radiation_per_time_delta * solid_angle / (4 * jnp.pi))
 
     @staticmethod
     def distance_between(object1: "CelestialBody", object2: "CelestialBody"):

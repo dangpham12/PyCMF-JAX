@@ -1,4 +1,4 @@
-import math
+import jax.numpy as jnp
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
@@ -45,7 +45,7 @@ class CelestialBody:
         :param other:
         :return: the solid angle in steradians unit
         """
-        return math.pi * (other.radius ** 2) / (self.get_universe().distance_between(self, other) ** 2)
+        return jnp.pi * (other.radius ** 2) / (self.get_universe().distance_between(self, other) ** 2)
 
     def discover(self, other: "CelestialBody"):
         """

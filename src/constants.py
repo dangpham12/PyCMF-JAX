@@ -1,8 +1,8 @@
-import numpy as np
+import jax.numpy as jnp
 
 CANVAS_SIZE = (400, 400)
 ICON_SIZE = (16, 16)
-DTYPE_ACCURACY = np.float32
+DTYPE_ACCURACY = jnp.float32
 
 COMPONENTS = ["WATER", "AIR", "LAND"]  # Here and not in the model universe because it is required by the GUI and the model
 
