@@ -13,7 +13,7 @@
   - Didn't adapt the energy transfer not including boundaries
 - Benchmark JAX
 - Compare JAX and GT4py performance
-
+- Do BENCHMARK before/after caching
 ## Memoire
 
 - Remove unnecessary parts + rework parts

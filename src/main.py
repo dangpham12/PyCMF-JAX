@@ -47,7 +47,7 @@ def simulation(grid_shape, nb_steps):
     return elapsed, mean
 
 if __name__ == "__main__":
-    grid_shape = (80,400,400) # (k, y, x)
+    grid_shape = (80, 50, 50) # (k, y, x)
     nb_steps = 50
     shape = str(grid_shape[1])
 
@@ -64,7 +64,8 @@ if __name__ == "__main__":
 
     with open(path, "r") as f:
         data_f = json.load(f)
-        data_f[shape] = data[shape]
+        data_f[shape]["elapsed"] = data[shape]["elapsed"]
+        data_f[shape]["mean"] = data[shape]["mean"]
 
     with open(path, "w") as f:
         json.dump(data_f, f, indent=4)
