@@ -49,13 +49,24 @@ def simulation(grid_shape, nb_steps):
 if __name__ == "__main__":
     grid_shape = (80,400,400) # (k, y, x)
     nb_steps = 50
+    shape = str(grid_shape[1])
 
+    jax.config.update("jax_enable_compilation_cache", False)
     jax.clear_caches()
+
     elapsed, mean = simulation(grid_shape, nb_steps)
-    data = {"elapsed": elapsed,"mean": mean}
+    data = {f"{grid_shape[1]}" : {"elapsed": elapsed, "mean": mean}}
 
     path= f"jax.json"
+    if not os.path.isfile(path):
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)
+
+    with open(path, "r") as f:
+        data_f = json.load(f)
+        data_f[shape] = data[shape]
+
     with open(path, "w") as f:
-        json.dump(data, f, indent=4)
+        json.dump(data_f, f, indent=4)
 
     os.system('say "finished"')
