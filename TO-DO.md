@@ -2,8 +2,9 @@
 
 ## Code
 
-- Benchmark enhanced GT4py
+- Benchmark enhanced GT4py V
 - Convert to JAX + benchmark
+- JAX earth.py, check for control flow
 - Compare JAX and GT4py performance
 
 ## Memoire
