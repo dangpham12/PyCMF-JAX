@@ -3,8 +3,15 @@
 ## Code
 
 - Benchmark enhanced GT4py V
-- Convert to JAX + benchmark
-- JAX earth.py, check for control flow
+- Convert to JAX
+  - JAX earth.py, check for control flow V
+  - Do ticking_earth.py V
+  - Static args expected if almost not change, how define them dynamic ?  => no use of static args anymore V
+  - Will attribute as parameters in jitted function work ? V
+  - Attributes used in jitted function ? => compile with value init, not modified further then no problem V
+  - !!! Code works, perfoms pretty well, nice scaling, precision similar to GT4py V
+  - Didn't adapt the energy transfer not including boundaries
+- Benchmark JAX
 - Compare JAX and GT4py performance
 
 ## Memoire

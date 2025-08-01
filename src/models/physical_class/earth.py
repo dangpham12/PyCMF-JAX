@@ -136,8 +136,9 @@ class Earth(EarthBase, CelestialBody):
         self._compute_component_chunk_composition = vmap(vmap(vmap(compute_component_chunk_composition)))
         self._compute_specific_heat_capacity = vmap(vmap(vmap(compute_specific_heat_capacity)))
 
+    @staticmethod
     @jit
-    def sum_horizontal_values(self, field: jnp.ndarray):
+    def sum_horizontal_values(field: jnp.ndarray):
         """
         Sum all the values of the input field on K = 0 level
         :param in_field:
@@ -222,9 +223,10 @@ class Earth(EarthBase, CelestialBody):
               f"- Total energy: {self.total_energy}\n" \
               f"- Composition: \n\t{f'{chr(10) + chr(9)} '.join(str(value * 100) + '% ' + key for key, value in self.composition.items())}"
         return res
-    
+
+    @staticmethod
     @jit
-    def energy_to_temperature(self, energy: DTYPE_ACCURACY, mass: DTYPE_ACCURACY, heat_capacity: DTYPE_ACCURACY):
+    def energy_to_temperature(energy: DTYPE_ACCURACY, mass: DTYPE_ACCURACY, heat_capacity: DTYPE_ACCURACY):
         """
         Set the temperature of the component by computing the energy from the mass and the temperature
         :param temperature:

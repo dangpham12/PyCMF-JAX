@@ -1,12 +1,9 @@
-import os, json, shutil, re
+import os, json, re
+
+import jax
 import numpy as np
 import time
 from tqdm import trange
-
-import jax
-import jax.numpy as jnp
-from jax import vmap
-from functools import partial
 
 from models.physical_class.universe import Universe
 from models.ticking_class.ticking_earth import TickingEarth
@@ -50,11 +47,13 @@ def simulation(grid_shape, nb_steps):
     return elapsed, mean
 
 if __name__ == "__main__":
-
-    grid_shape = (80,50,50) # (k, y, x)
+    grid_shape = (80,400,400) # (k, y, x)
     nb_steps = 50
 
-    data= {}
+    jax.clear_caches()
+    elapsed, mean = simulation(grid_shape, nb_steps)
+    data = {"elapsed": elapsed,"mean": mean}
+
     path= f"jax.json"
     with open(path, "w") as f:
         json.dump(data, f, indent=4)

@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+from black.linegen import partial
 from jax import jit, vmap
 
 from src.models.ABC.ticking_model import TickingModel
@@ -71,6 +72,11 @@ class TickingEarth(Earth, TickingModel):
         self._carbon_cycle = vmap(vmap(vmap(carbon_cycle)))
         self._coefficient = vmap(vmap(vmap(coefficient)))
 
+    @staticmethod
+    @partial(jit, static_argnames=["shift", "axis"])
+    def neighbour(chunk_temp, shift, axis):
+        return jnp.roll(chunk_temp, shift=shift, axis=axis)
+
     def update(self):
         """
         Special reimplementation of update to update all the components of the earth as well.
@@ -88,15 +94,15 @@ class TickingEarth(Earth, TickingModel):
         """
         self.chunk_temp = self._compute_chunk_temperature(self.water_energy, self.water_mass, self.air_energy, self.air_mass, self.land_energy, self.land_mass)
         temp_coefficient = self._coefficient(self.heat_transfer_coefficient, self.specific_heat_capacity) #unroll the double loop in compute_energy_transfer
-        temp_neighbour_k_up = jnp.roll(self.chunk_temp, shift=-1, axis=0)
-        temp_neighbour_k_down = jnp.roll(self.chunk_temp, shift=1, axis=0)
-        temp_neighbour_y_north = jnp.roll(self.chunk_temp, shift=-1, axis=1)
-        temp_neighbour_y_south = jnp.roll(self.chunk_temp, shift=1, axis=1)
-        temp_neighbour_x_east = jnp.roll(self.chunk_temp, shift=-1, axis=2)
-        temp_neighbour_x_west = jnp.roll(self.chunk_temp, shift=1, axis=2) # shift for every neighbour and parallelized their computation
+        temp_neighbour_k_up = self.neighbour(self.chunk_temp, shift=-1, axis=0)
+        temp_neighbour_k_down = self.neighbour(self.chunk_temp, shift=1, axis=0)
+        temp_neighbour_y_north = self.neighbour(self.chunk_temp, shift=-1, axis=1)
+        temp_neighbour_y_south = self.neighbour(self.chunk_temp, shift=1, axis=1)
+        temp_neighbour_x_east = self.neighbour(self.chunk_temp, shift=-1, axis=2)
+        temp_neighbour_x_west = self.neighbour(self.chunk_temp, shift=1, axis=2) # shift for every neighbour and parallelized their computation
         temp_energy = self._compute_energy_transfer(self.chunk_temp, temp_neighbour_k_up, temp_neighbour_k_down,
                                                     temp_neighbour_y_north, temp_neighbour_y_south, temp_neighbour_x_east,
-                                                    temp_neighbour_x_west, temp_coefficient, origin=self.origin)
+                                                    temp_neighbour_x_west, temp_coefficient) # precise origin for boundaries ?
         self.water_energy, self.air_energy, self.land_energy = self._add_energy(temp_energy, self.water_energy, self.water_mass, self.air_energy, self.air_mass, self.land_energy, self.land_mass)
 
 
