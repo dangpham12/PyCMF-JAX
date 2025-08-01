@@ -3,6 +3,7 @@ import numpy as np
 import time
 from tqdm import trange
 
+import jax
 import jax.numpy as jnp
 from jax import vmap
 from functools import partial
@@ -12,17 +13,19 @@ from models.ticking_class.ticking_earth import TickingEarth
 from models.ticking_class.ticking_sun import TickingSun
 from constants import DTYPE_ACCURACY
 
+strip_word = re.search(r"\.(\w+)'", str(DTYPE_ACCURACY))
+dtype = strip_word.group(1)
 np.random.seed(0)
 
-def simulation(grid_shape, nb_steps, backend="numpy"):
+def simulation(grid_shape, nb_steps):
     iter_steps = np.zeros(nb_steps, dtype=float)
     compile_time = time.time()
 
     universe = Universe()
     universe.sun = TickingSun()  # Can be replaced with Sun()
-    print("Running model with backend:", backend)
+    print("Running model with JAX")
     print("Generating the earth...")
-    universe.earth = TickingEarth(shape=grid_shape, backend=backend)
+    universe.earth = TickingEarth(shape=grid_shape)
     universe.discover_everything()
 
     # Fills the earth with random GridChunk of water
@@ -47,33 +50,13 @@ def simulation(grid_shape, nb_steps, backend="numpy"):
     return elapsed, mean
 
 if __name__ == "__main__":
-    backend = "dace:gpu"  # Change this to the desired backend
-    grid_shape = (400, 400, 80)
+
+    grid_shape = (80,50,50) # (k, y, x)
     nb_steps = 50
 
-    strip_word = re.search(r"\.(\w+)'", str(DTYPE_ACCURACY))
-    dtype = strip_word.group(1)
-
     data= {}
-    elapsed, mean = simulation(grid_shape, nb_steps, backend)
-
-    data[backend] = { "total": elapsed, "mean": mean}
-
-    if os.path.isdir(".gt_cache"):
-        shutil.rmtree(".gt_cache")
-    if os.path.isdir(".dacecache"):
-        shutil.rmtree(".dacecache")
-
-    path= f"{grid_shape[0]}_{dtype}_devicesync.json"
-    if not os.path.isfile(path):
-        with open(path, "w") as f:
-            json.dump({}, f, indent=4)
-
-    with open(path, "r") as f:
-        data_f = json.load(f)
-        data_f[backend] = data[backend]
-
+    path= f"jax.json"
     with open(path, "w") as f:
-        json.dump(data_f, f, indent=4)
+        json.dump(data, f, indent=4)
 
     os.system('say "finished"')
