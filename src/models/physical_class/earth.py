@@ -78,17 +78,16 @@ class Earth(EarthBase, CelestialBody):
                                 air_mass: jnp.float32,
                                 land_energy: jnp.float32,
                                 land_mass: jnp.float32):
-            temp = 0.0
-            nb_components = 0
-            if water_mass != 0:
-                temp += water_energy / (constants.WATER_HEAT_CAPACITY * water_mass)
-                nb_components += 1
-            if air_mass != 0:
-                temp += air_energy / (constants.AIR_HEAT_CAPACITY * air_mass)
-                nb_components += 1
-            if land_mass != 0:
-                temp += land_energy / (constants.LAND_HEAT_CAPACITY * land_mass)
-                nb_components += 1
+            water_cond = water_mass != 0
+            air_cond = air_mass != 0
+            land_cond = land_mass != 0
+
+            temp = (jnp.where(water_cond, water_energy / (constants.WATER_HEAT_CAPACITY * water_mass), 0.0) +
+                          jnp.where(air_cond, air_energy / (constants.AIR_HEAT_CAPACITY * air_mass), 0.0) +
+                          jnp.where(land_cond, land_energy / (constants.LAND_HEAT_CAPACITY * land_mass), 0.0))
+
+            nb_components = +water_cond + +air_cond + +land_cond #unary ops convert bool to int
+
             return temp / nb_components
 
         @jit
@@ -122,18 +121,9 @@ class Earth(EarthBase, CelestialBody):
             Distribute a same amount of energy on all the chunk of the earth
             """
             chunk_mass = (water_mass + air_mass + land_mass)
-            if water_mass != 0:
-                water_temp = water_energy + input_energy * (water_mass/chunk_mass)
-            else:
-                water_temp = water_energy
-            if air_mass != 0:
-                air_temp = air_energy + input_energy * (air_mass/chunk_mass)
-            else:
-                air_temp = air_energy
-            if land_mass != 0:
-                land_temp = land_energy + input_energy * (land_mass/chunk_mass)
-            else:
-                land_temp = land_energy
+            water_temp = jnp.where(water_mass != 0, water_energy + input_energy * (water_mass / chunk_mass), water_energy)
+            air_temp = jnp.where(air_mass != 0, air_energy + input_energy * (air_mass / chunk_mass), air_energy)
+            land_temp = jnp.where(land_mass != 0, land_energy + input_energy * (land_mass / chunk_mass), land_energy)
 
             return water_temp, air_temp, land_temp
 
@@ -263,7 +253,7 @@ class Earth(EarthBase, CelestialBody):
         key = jax.random.PRNGKey(0) # Keys are not reusable, use slice to make more random for other instances
 
         self.water_mass = jnp.full(shape=self.shape, fill_value=1000, dtype=DTYPE_ACCURACY)
-        water_temp = jax.random.uniform(key, shape=self.shape, dtype=DTYPE_ACCURACY, minval=290, maxval=310)
+        water_temp = jax.random.uniform(key, shape=self.shape, dtype=DTYPE_ACCURACY, minval=290, maxval=310) # maybe put back np random for same results
         self.water_energy = self._temperature_to_energy_field(water_temp, self.water_mass)
 
         self.chunk_mass = self._compute_chunk_mass(self.water_mass, self.air_mass, self.land_mass)
