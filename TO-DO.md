@@ -11,9 +11,9 @@
   - Attributes used in jitted function ? => compile with value init, not modified further then no problem V
   - !!! Code works, perfoms pretty well, nice scaling, precision similar to GT4py V
   - Didn't adapt the energy transfer not including boundaries
-- Benchmark JAX
-- Compare JAX and GT4py performance
+- Benchmark JAX V
 - Do BENCHMARK before/after caching
+- 
 ## Memoire
 
 - Remove unnecessary parts + rework parts

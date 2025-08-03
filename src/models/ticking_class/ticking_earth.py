@@ -20,12 +20,10 @@ class TickingEarth(Earth, TickingModel):
         self.time_delta = self.get_universe().TIME_DELTA
         self.evaporation_rate = self.get_universe().EVAPORATION_RATE
 
-        @jit # automatically vectorised if inside function being vectorised
         def coefficient(heat_transfer_coefficient: jnp.float32,
                              specific_heat_capacity: jnp.float32):
             return heat_transfer_coefficient * specific_heat_capacity * self.time_delta # constant not modified during runtime
         
-        @jit
         def compute_energy_transfer(chunk_temp: jnp.float32, neighbour_k_up: jnp.float32, neighbour_k_down: jnp.float32,
                                     neighbour_y_north: jnp.float32, neighbour_y_south: jnp.float32, neighbour_x_east: jnp.float32,
                                     neighbour_x_west: jnp.float32, coefficient: jnp.float32):
@@ -43,7 +41,6 @@ class TickingEarth(Earth, TickingModel):
             energy += (neighbour_x_west - chunk_temp) * coefficient
             return energy
 
-        @jit
         def water_evaporation(water_mass: jnp.float32, air_mass: jnp.float32):
             """
             Evaporate water from the water component of the grid chunk
@@ -56,7 +53,6 @@ class TickingEarth(Earth, TickingModel):
 
             return water_temp, air_temp
 
-        @jit
         def carbon_cycle(carbon_ppm: jnp.float32, carbon_per_chunk: jnp.float32):
             """
             Globally computes carbon flow to be applied to each grid chunk
@@ -67,10 +63,10 @@ class TickingEarth(Earth, TickingModel):
             return carbon_temp
 
 
-        self._water_evaporation = vmap(vmap(vmap(water_evaporation)))
-        self._compute_energy_transfer = vmap(vmap(vmap(compute_energy_transfer)))
-        self._carbon_cycle = vmap(vmap(vmap(carbon_cycle)))
-        self._coefficient = vmap(vmap(vmap(coefficient)))
+        self._water_evaporation = jit(vmap(vmap(vmap(water_evaporation))))
+        self._compute_energy_transfer = jit(vmap(vmap(vmap(compute_energy_transfer))))
+        self._carbon_cycle = jit(vmap(vmap(vmap(carbon_cycle))))
+        self._coefficient = jit(vmap(vmap(vmap(coefficient))))
 
     @staticmethod
     @partial(jit, static_argnames=["shift", "axis"])

@@ -31,8 +31,7 @@ class Earth(EarthBase, CelestialBody):
         def component_ratio(component_mass: jnp.float32, chunk_mass: jnp.float32) -> DTYPE_ACCURACY:
             return component_mass / chunk_mass
 
-        @jit
-        def compute_heat_transfer_coefficient(water_mass: jnp.float32, 
+        def compute_heat_transfer_coefficient(water_mass: jnp.float32,
                                               air_mass: jnp.float32, 
                                               land_mass: jnp.float32, 
                                               chunk_mass: jnp.float32):
@@ -40,8 +39,8 @@ class Earth(EarthBase, CelestialBody):
             return component_ratio(water_mass, chunk_mass) * constants.WATER_HEAT_TRANSFER_COEFFICIENT + \
                                             component_ratio(air_mass, chunk_mass) * constants.AIR_HEAT_TRANSFER_COEFFICIENT + \
                                             component_ratio(land_mass, chunk_mass) * constants.LAND_HEAT_TRANSFER_COEFFICIENT
-        @jit
-        def compute_specific_heat_capacity(water_mass: jnp.float32, 
+
+        def compute_specific_heat_capacity(water_mass: jnp.float32,
                                             air_mass: jnp.float32,
                                             land_mass: jnp.float32,
                                             chunk_mass: jnp.float32):
@@ -49,7 +48,7 @@ class Earth(EarthBase, CelestialBody):
             return component_ratio(water_mass, chunk_mass) * constants.WATER_HEAT_CAPACITY + \
                                         component_ratio(air_mass, chunk_mass) * constants.AIR_HEAT_CAPACITY + \
                                         component_ratio(land_mass, chunk_mass) * constants.LAND_HEAT_CAPACITY
-        @jit
+
         def compute_component_chunk_composition(component_mass: jnp.float32,
                                       chunk_mass: jnp.float32):
 
@@ -64,7 +63,7 @@ class Earth(EarthBase, CelestialBody):
             :return:
             """
             return temperature * mass * constants.WATER_HEAT_CAPACITY
-        @jit
+
         def temperature_to_energy_field(temperature: jnp.float32,
                                         mass: jnp.float32):
 
@@ -72,7 +71,7 @@ class Earth(EarthBase, CelestialBody):
             
 
         @jit
-        def chunk_temperature(water_energy: jnp.float32, 
+        def chunk_temperature(water_energy: jnp.float32,
                                 water_mass: jnp.float32,
                                 air_energy: jnp.float32,
                                 air_mass: jnp.float32,
@@ -90,8 +89,7 @@ class Earth(EarthBase, CelestialBody):
 
             return temp / nb_components
 
-        @jit
-        def compute_chunk_temperature(water_energy: jnp.float32, 
+        def compute_chunk_temperature(water_energy: jnp.float32,
                                         water_mass: jnp.float32, 
                                         air_energy: jnp.float32, 
                                         air_mass: jnp.float32, 
@@ -99,7 +97,6 @@ class Earth(EarthBase, CelestialBody):
                                         land_mass: jnp.float32):
             return chunk_temperature(water_energy=water_energy, water_mass=water_mass, air_energy=air_energy, air_mass=air_mass, land_energy=land_energy, land_mass=land_mass)
 
-        @jit
         def compute_chunk_mass(water_mass: jnp.float32,
                                 air_mass: jnp.float32, 
                                 land_mass: jnp.float32):
@@ -109,7 +106,6 @@ class Earth(EarthBase, CelestialBody):
         def sum_vertical_values(in_field: jnp.ndarray):
             return jnp.cumsum(in_field[::-1],axis=0)[::-1]
 
-        @jit
         def add_energy(input_energy: jnp.float32,
                        water_energy: jnp.float32,
                        water_mass: jnp.float32,
@@ -127,14 +123,14 @@ class Earth(EarthBase, CelestialBody):
 
             return water_temp, air_temp, land_temp
 
-        self._add_energy = vmap(vmap(vmap(add_energy)))
-        self._compute_chunk_mass = vmap(vmap(vmap(compute_chunk_mass)))
-        self._compute_chunk_temperature = vmap(vmap(vmap(compute_chunk_temperature)))
+        self._add_energy = jit(vmap(vmap(vmap(add_energy))))
+        self._compute_chunk_mass = jit(vmap(vmap(vmap(compute_chunk_mass))))
+        self._compute_chunk_temperature = jit(vmap(vmap(vmap(compute_chunk_temperature))))
         self._sum_vertical_values = sum_vertical_values
-        self._temperature_to_energy_field = vmap(vmap(vmap(temperature_to_energy_field)))
-        self._compute_heat_transfer_coefficient = vmap(compute_heat_transfer_coefficient)
-        self._compute_component_chunk_composition = vmap(vmap(vmap(compute_component_chunk_composition)))
-        self._compute_specific_heat_capacity = vmap(vmap(vmap(compute_specific_heat_capacity)))
+        self._temperature_to_energy_field = jit(vmap(vmap(vmap(temperature_to_energy_field))))
+        self._compute_heat_transfer_coefficient = jit(vmap(compute_heat_transfer_coefficient))
+        self._compute_component_chunk_composition = jit(vmap(vmap(vmap(compute_component_chunk_composition))))
+        self._compute_specific_heat_capacity = jit(vmap(vmap(vmap(compute_specific_heat_capacity))))
 
     @staticmethod
     @jit
