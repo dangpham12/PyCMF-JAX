@@ -128,7 +128,7 @@ class Earth(EarthBase, CelestialBody):
         self._compute_chunk_temperature = jit(vmap(vmap(vmap(compute_chunk_temperature))))
         self._sum_vertical_values = sum_vertical_values
         self._temperature_to_energy_field = jit(vmap(vmap(vmap(temperature_to_energy_field))))
-        self._compute_heat_transfer_coefficient = jit(vmap(compute_heat_transfer_coefficient))
+        self._compute_heat_transfer_coefficient = jit(vmap(vmap(vmap(compute_heat_transfer_coefficient))))
         self._compute_component_chunk_composition = jit(vmap(vmap(vmap(compute_component_chunk_composition))))
         self._compute_specific_heat_capacity = jit(vmap(vmap(vmap(compute_specific_heat_capacity))))
 
