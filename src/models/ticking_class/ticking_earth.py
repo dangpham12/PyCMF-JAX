@@ -1,6 +1,5 @@
 import jax
 import jax.numpy as jnp
-from black.linegen import partial
 from jax import jit, vmap
 
 from src.models.ABC.ticking_model import TickingModel
@@ -69,7 +68,6 @@ class TickingEarth(Earth, TickingModel):
         self._coefficient = jit(vmap(vmap(vmap(coefficient))))
 
     @staticmethod
-    @partial(jit, static_argnames=["shift", "axis"])
     def neighbour(chunk_temp, shift, axis):
         return jnp.roll(chunk_temp, shift=shift, axis=axis)
 
