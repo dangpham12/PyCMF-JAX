@@ -2,12 +2,12 @@
 
 ## Objectives
 
-This project is based on previous works called PyCMF and PyCMF-GT4Py respectively, which aimed to experiment Object-Oriented technology and the use of Python in a Climate Modelling context.
+This project is based on previous works called **PyCMF** and **PyCMF-GT4Py** which were done by **Nathan Marotte** and **Matthias Van der Cam** respectively, which aimed to experiment Object-Oriented technology and the use of Python in a Climate Modelling context.
 It concluded that OO brings a lot of flexibility and modularity to the code, but that it is not the best choice for performance. 
 Moreover, the GT4Py improves drastically the performance while being portable for all architectures.
 All visualisation implementations were abandoned.
 
-The goal with this project is to use JAX to provide a performant and flexible framework for climate modelling, while keeping the modularity and flexibility of the previous projects.
+The goal with this project is to use **JAX library** to provide a performant and flexible framework for climate modelling, while keeping the modularity and flexibility of the previous projects.
 With this implementation, we aim to provide a framework that could be also compared to the GT4Py implementation enhanced.
 
 ## Introduction
