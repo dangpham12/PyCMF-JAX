@@ -1,4 +1,4 @@
-import os, json, re
+import os
 
 import jax
 import numpy as np
@@ -8,10 +8,7 @@ from tqdm import trange
 from models.physical_class.universe import Universe
 from models.ticking_class.ticking_earth import TickingEarth
 from models.ticking_class.ticking_sun import TickingSun
-from constants import DTYPE_ACCURACY
 
-strip_word = re.search(r"\.(\w+)'", str(DTYPE_ACCURACY))
-dtype = strip_word.group(1)
 np.random.seed(0)
 
 def simulation(grid_shape, nb_steps):
@@ -49,25 +46,10 @@ def simulation(grid_shape, nb_steps):
 if __name__ == "__main__":
     grid_shape = (80, 50, 50) # (k, y, x)
     nb_steps = 50
-    shape = str(grid_shape[1])
 
     jax.config.update("jax_enable_compilation_cache", False)
     jax.clear_caches()
 
     elapsed, mean = simulation(grid_shape, nb_steps)
-    data = {f"{grid_shape[1]}" : {"elapsed": elapsed, "mean": mean}}
 
-    path= f"jax.json"
-    if not os.path.isfile(path):
-        with open(path, "w") as f:
-            json.dump(data, f, indent=4)
-
-    with open(path, "r") as f:
-        data_f = json.load(f)
-        data_f[shape]["elapsed"] = data[shape]["elapsed"]
-        data_f[shape]["mean"] = data[shape]["mean"]
-
-    with open(path, "w") as f:
-        json.dump(data_f, f, indent=4)
-
-    os.system('say "finished"')
+    os.system('say "finished"') # Notify end of simulation

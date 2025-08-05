@@ -1,10 +1,14 @@
-# PyCMF with GT4Py
+# PyCMF with JAX
 
 ## Objectives
 
-This project is based on a previous work called PyCMF which aimed to experiment Object-Oriented technology and the use of Python in a Climate Modelling context. It concluded that OO brings a lot of flexibility and modularity to the code, but that it is not the best choice for performance. This project aims to improve the performance of the PyCMF framework by using GT4Py, a library that allows to generate high-performance code for stencil computations on structured grids. This project aimed to keep as much as possible the original structure of PyCMF, while adding the GT4Py code generation for the most performance-critical parts of the code. We will see that the performance of the code is greatly improved, but that the OO structure of PyCMF had to be adapted to the GT4Py code generation especially for the grid modelisation.
+This project is based on previous works called PyCMF and PyCMF-GT4Py respectively, which aimed to experiment Object-Oriented technology and the use of Python in a Climate Modelling context.
+It concluded that OO brings a lot of flexibility and modularity to the code, but that it is not the best choice for performance. 
+Moreover, the GT4Py improves drastically the performance while being portable for all architectures.
+All visualisation implementations were abandoned.
 
-The graphical interface of PyCMF has not been ported to this version, as it was not the main focus of this project.
+The goal with this project is to use JAX to provide a performant and flexible framework for climate modelling, while keeping the modularity and flexibility of the previous projects.
+With this implementation, we aim to provide a framework that could be also compared to the GT4Py implementation enhanced.
 
 ## Introduction
 
@@ -21,17 +25,30 @@ Python Climate Modelling Framework (or PyCMF for short) is a framework developpe
 The framework is currently **not** able to provide accurate simulations of real-world physical process, but provides a
 few examples with placeholder simulations such as the averaging of the temperature at each time step
 
+
+PyCMF-GT4Py was a project that aimed to use the GT4Py library to generate stencils for the models. 
+- Stencils methods were defined with @gtscript.stencil decorator,
+- Practical functions only used in those stencils were defined with @gtscript.function decorator
+- Parallelization was done with the `with computation(keyword), interval(...)`, horizontal plane is already parallelized but the interval could be determined. `keyword` could take the values of `PARALLEL`, `FORWARD`, `BACKWARD`.
+
+## Structure of the code
+
+Although JAX was created for machine learning, it is a powerful library that can be used for numerical computing and scientific computing in general.
+
+We used those following features of JAX to implement the framework:
+- JAX's `jit()` decorator to compile functions for performance.
+- JAX's `vmap()` to vectorize functions over arrays, allowing for efficient batch processing.
+
+We also took advantage of the full reimplementation of the NumPy API in JAX, which allows us to use some functions to apply arrays transformations. 
+It should be noted that JAX arrays are immutable and multiple restrictions have to be respected to use correctly the JAX library.
 ## Running the code
 
 ### Required Libraries
 
-- numpy for the models
-- GT4Py for the stencils generation
+- JAX library
 
 
 To run the framework, you can edit the script in `main.py` and then execute it with `python3.11 src/main.py`.
-
-
 
 ## How to add a new model
 
